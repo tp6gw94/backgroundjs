@@ -1,20 +1,16 @@
 navigator.serviceWorker.register("sw.js");
 
-const form = document.querySelector("#form");
+document.getElementById("btn").addEventListener("click", async () => {
+  const registration = await navigator.serviceWorker.ready;
+  const permissionStatus = await navigator.permissions.query({
+    name: "periodic-background-sync",
+  });
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const formData = new FormData(form);
-  const data = {
-    name: formData.get("name"),
-    msg: formData.get("msg"),
-  };
-
-  const formCache = await caches.open("form");
-  formCache.put("/data", new Response(JSON.stringify(data)));
-
-  if ("SyncManager" in window) {
-    const reg = await navigator.serviceWorker.ready;
-    reg.sync.register("submit-form");
+  if (permissionStatus.state === "granted") {
+    registration.periodicSync.register("news", {
+      minInterval: 12 * 60 * 60 * 1000,
+    });
+  } else {
+    console.log("Permission Denied");
   }
 });
