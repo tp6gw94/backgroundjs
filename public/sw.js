@@ -1,14 +1,12 @@
-console.log("registered service work");
-
-self.addEventListener("periodicsync", (event) => {
-  switch (event.tag) {
-    case "test-tag-from-devtools": {
-      console.log("test-tag-from-devtools");
-      event.waitUntil();
-    }
-    case "news": {
-      console.log("news");
-      event.waitUntil();
-    }
+self.addEventListener("push", (event) => {
+  if (event.data) {
+    console.log(event.data.text());
+    event.waitUntil(
+      (function () {
+        self.registration.showNotification("title", {
+          body: event.data.text(),
+        });
+      })()
+    );
   }
 });
